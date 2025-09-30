@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timezone
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -28,6 +29,12 @@ def submit_survey():
         submission = SurveySubmission(**payload)
     except ValidationError as ve:
         return jsonify({"error": "validation_error", "detail": ve.errors()}), 422
+
+    if not submission.submission_id:
+        timestamp = datetime.utcnow().strftime("%Y%m%d%H")
+        submission.submission_id = hashlib.sha256(
+            (submission.email + timestamp).encode("utf-8")
+        ).hexdigest()
 
     record = StoredSurveyRecord(
         **submission.dict(),
