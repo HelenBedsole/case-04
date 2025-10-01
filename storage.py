@@ -6,6 +6,9 @@ from typing import Mapping, Any
 
 RESULTS_PATH = Path("data/survey.ndjson")
 
+def _sha256(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
 def append_json_line(record: Mapping[str, Any]) -> None:
     record = dict(record)
     if "email" in record and record["email"] is not None:
